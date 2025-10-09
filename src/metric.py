@@ -6,7 +6,7 @@ class ICMetric:
     def __init__(self, ret: torch.Tensor, method='spearman'):
         self.ret = ret
         self.method = method
-        self.N = torch.isnan(ret).sum()
+        self.N = (~torch.isnan(ret)).sum()
         self.device = ret.device
 
     def _mean_ic(self, factor: torch.Tensor):
@@ -22,7 +22,7 @@ class ICMetric:
         return (x_s * y_s).nanmean(dim=1).nanmean()
 
     def __call__(self, factor: torch.Tensor):
-        nan_proportion = 1 - torch.isnan(factor).sum() / self.N
+        nan_proportion = torch.isnan(factor).sum() / self.N
         if nan_proportion > 0.2:
             return torch.tensor(0.0, device=self.device)
         else:
